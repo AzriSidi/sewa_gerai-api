@@ -75,8 +75,27 @@ class ApiController extends REST_Controller {
 		$input['FLAG'] = $item->FLAG;
 		$input['NO_RUJUKAN'] = $item->NO_RUJUKAN;
 		$input['SALURAN'] = $item->SALURAN;
-		$data = $this->ApiModel->updatePay($input);
-		$mgs = array("mgs"=>$data);
-        $this->response($mgs);
+
+		$headers = $this->input->request_headers();
+		if(isset($headers['token'])){
+			$token = $headers['token'];
+		}else{
+			$token = false;
+		}
+		// Extract the token
+		if($token){
+			$authToken = $this->JwtModel->decodeToken($token);
+			if($authToken){
+				$data = $this->ApiModel->updatePay($input);
+				$response = array("mgs"=>$data);
+			}else{
+				$status = parent::HTTP_UNAUTHORIZED;
+				$response = ['status' => $status, 'msg' => 'Unauthorized Access!'];
+			}
+		}else{
+			$status = parent::HTTP_UNAUTHORIZED;
+			$response = ['status' => $status, 'msg' => 'Unauthorized Access!'];
+		}		
+        $this->response($response);
 	}
 }
