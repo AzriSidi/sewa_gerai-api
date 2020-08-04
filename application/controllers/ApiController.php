@@ -43,8 +43,8 @@ class ApiController extends REST_Controller {
 	function getPay_get($no_akaun){		
 		// Get all the headers
 		$headers = $this->input->request_headers();
-		if(isset($headers['token'])){
-			$token = $headers['token'];
+		if(isset($headers['Token'])){
+			$token = $headers['Token'];
 		}else{
 			$token = false;
 		}
@@ -77,8 +77,8 @@ class ApiController extends REST_Controller {
 		$input['SALURAN'] = $item->SALURAN;
 
 		$headers = $this->input->request_headers();
-		if(isset($headers['token'])){
-			$token = $headers['token'];
+		if(isset($headers['Token'])){
+			$token = $headers['Token'];
 		}else{
 			$token = false;
 		}
