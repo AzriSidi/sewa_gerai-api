@@ -91,8 +91,17 @@ class ApiModel extends CI_Model{
 			 ->where('flag',"'SUCCESSFUL'",false)
 			 ->where('status_kutipan IS NULL',null,false);
 		$query2 = $this->db->get_compiled_select();
+
+		$this->db
+			 ->select($clmn2.' from gerai.bayaran_terkini',false)
+			 ->where('no_akaun',"'".$no_akaun."'",false)
+			 ->where('flag',"'SUCCESSFUL'",false)
+			 ->where('tarikh_post IS NULL',null,false);
+		$query3 = $this->db->get_compiled_select();
 		
-		$query = $this->db->query($query1." UNION ".$query2)->row();
+		$query = $this->db->query($query1." UNION ".$query2." UNION ".$query3)->row();
+		
+		// $query = $this->db->query($query1." UNION ".$query2)->row();
 		if($query != null){
 			return $query;
 		}else{
