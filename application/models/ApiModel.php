@@ -76,6 +76,7 @@ class ApiModel extends CI_Model{
 
 	public function checkResit($no_akaun){
 		$clmn = 'TO_CHAR(tarikh) as TARIKH,TO_CHAR(masa) as MASA,no_resit';
+		$clmn2 = "TO_CHAR(tarikh_bayar,'dd-mm-yyyy') as TARIKH,TO_CHAR(tarikh_bayar,'hh:mi:ss') as MASA,no_resit";
 		
 		$this->db
 			 ->select($clmn.' from kutipan.kutipan',false)
