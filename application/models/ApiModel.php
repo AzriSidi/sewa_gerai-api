@@ -169,22 +169,25 @@ class ApiModel extends CI_Model{
 	}
 
 	public function updatePay($input){
-		$tkh_byr = $input['TARIKH_BAYAR'];
+		$mgs = false;		
+		$checkInput = in_array(null, $input, true);
+		if(!$checkInput){
+			$tkh_byr = $input['TARIKH_BAYAR'];
 
-		$this->db->set('NO_AKAUN', $input['NO_AKAUN'])
-				 ->set('NAMA', $input['NAMA'])
-		  		 ->set('TARIKH_BAYAR', "to_date('$tkh_byr','DDMMYYYY HH24MISS')",FALSE)
-			 	 ->set('NO_RESIT', $input['NO_RESIT'])
-				 ->set('AMAUN', $input['AMAUN'])
-				 ->set('FLAG', $input['FLAG'])
-				 ->set('NO_RUJUKAN', $input['NO_RUJUKAN'])
-			 	 ->set('SALURAN', $input['SALURAN'])
-         		 ->insert("GERAI.BAYARAN_TERKINI");
-
-        if($this->db->affected_rows() > 0){
-            $mgs = "success";
-        }else{
-            $mgs = "no affected row";
+			$this->db->where('NO_AKAUN', $input['NO_AKAUN']);
+			$query = $this->db->get('GERAI.PENYEWA');
+			if ($query->num_rows() > 0){
+				$this->db->set('NO_AKAUN', $input['NO_AKAUN'])
+					->set('NAMA', $input['NAMA'])
+					->set('TARIKH_BAYAR', "to_date('$tkh_byr','DDMMYYYY HH24MISS')",FALSE)
+					->set('NO_RESIT', $input['NO_RESIT'])
+					->set('AMAUN', $input['AMAUN'])
+					->set('FLAG', $input['FLAG'])
+					->set('NO_RUJUKAN', $input['NO_RUJUKAN'])
+					->set('SALURAN', $input['SALURAN'])
+					->insert("GERAI.BAYARAN_TERKINI");
+					$mgs = true;
+			}
 		}
 		return $mgs;
 	}

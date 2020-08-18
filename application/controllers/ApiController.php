@@ -86,9 +86,14 @@ class ApiController extends REST_Controller {
 		if($token){
 			$authToken = $this->JwtModel->decodeToken($token);
 			if($authToken){
-				$status = parent::HTTP_OK;
 				$data = $this->ApiModel->updatePay($input);
-				$response = array('status' => $status,"mgs"=>$data);
+				if($data){					
+					$status = parent::HTTP_OK;
+					$response = array('status' => $status,'mgs'=>'success');
+				}else{
+					$status = parent::HTTP_FORBIDDEN;
+					$response = ['status' => $status, 'msg' => 'FORBIDDEN'];
+				}
 			}else{
 				$status = parent::HTTP_UNAUTHORIZED;
 				$response = ['status' => $status, 'msg' => 'Unauthorized Access!'];
