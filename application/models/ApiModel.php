@@ -169,7 +169,8 @@ class ApiModel extends CI_Model{
 	}
 
 	public function updatePay($input){
-		$mgs = false;	
+		$mgs = false;
+			
 		if(is_null($input['NAMA'])){
 			unset($input['NAMA']);
 			$checkInput = in_array(NULL, $input, true);
