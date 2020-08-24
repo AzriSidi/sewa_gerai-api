@@ -169,9 +169,22 @@ class ApiModel extends CI_Model{
 	}
 
 	public function updatePay($input){
-		$mgs = false;		
-		$checkInput = in_array(null, $input, true);
-		if(!$checkInput){
+		$mgs = false;	
+		if(is_null($input['NAMA'])){
+			unset($input['NAMA']);
+			$checkInput = in_array(NULL, $input, true);
+			if(!$checkInput){
+				$input['NAMA'] = NULL;
+				$mgs = true;
+			}
+		}else{
+			$checkInput = in_array(NULL, $input, true);
+			if(!$checkInput){
+				$mgs = true;
+			}
+		}
+		
+		if($mgs){
 			$tkh_byr = $input['TARIKH_BAYAR'];
 
 			$this->db->where('NO_AKAUN', $input['NO_AKAUN']);
@@ -186,7 +199,6 @@ class ApiModel extends CI_Model{
 					->set('NO_RUJUKAN', $input['NO_RUJUKAN'])
 					->set('SALURAN', $input['SALURAN'])
 					->insert("GERAI.BAYARAN_TERKINI");
-					$mgs = true;
 			}
 		}
 		return $mgs;
