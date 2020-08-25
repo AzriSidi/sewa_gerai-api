@@ -26,7 +26,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 $site_url = ((isset($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off') || (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')) ? 'https' : 'http';
 $site_url .= '://' . (isset($_SERVER['HTTP_HOST']) ? $_SERVER['HTTP_HOST'] : '');
 $site_url .= str_replace(basename($_SERVER['SCRIPT_NAME']), '', $_SERVER['SCRIPT_NAME']);
-$config['base_url'] = $site_url;//"http://". $_SERVER['SERVER_NAME'] . preg_replace('@/+$@','', dirname($_SERVER['SCRIPT_NAME']));
+$config['base_url'] = $site_url;
 
 /*
 |--------------------------------------------------------------------------
