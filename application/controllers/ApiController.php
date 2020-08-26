@@ -62,8 +62,8 @@ class ApiController extends REST_Controller {
 			$status = parent::HTTP_UNAUTHORIZED;
 			$response = ['status' => $status, 'msg' => 'Unauthorized Access!'];
 		}
-		echo current_url();
-		// $this->response($response);
+		// echo current_url();
+		$this->response($response);
 	}
 
 	function updatePay_post(){
@@ -103,8 +103,7 @@ class ApiController extends REST_Controller {
 		}else{
 			$status = parent::HTTP_UNAUTHORIZED;
 			$response = ['status' => $status, 'msg' => 'Unauthorized Access!'];
-		}
-		echo current_url();		
+		}	
         $this->response($response);
 	}
 }

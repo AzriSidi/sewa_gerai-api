@@ -187,6 +187,7 @@ class ApiModel extends CI_Model{
 		
 		if($mgs){
 			$tkh_byr = $input['TARIKH_BAYAR'];
+			$mgs = false;
 
 			$this->db->where('NO_AKAUN', $input['NO_AKAUN']);
 			$query = $this->db->get('GERAI.PENYEWA');
@@ -200,6 +201,7 @@ class ApiModel extends CI_Model{
 					->set('NO_RUJUKAN', $input['NO_RUJUKAN'])
 					->set('SALURAN', $input['SALURAN'])
 					->insert("GERAI.BAYARAN_TERKINI");
+				$mgs = true;
 			}
 		}
 		return $mgs;
