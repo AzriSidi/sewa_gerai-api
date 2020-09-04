@@ -5,6 +5,8 @@ require APPPATH.'/libraries/REST_Controller.php';
 use api\libraries\REST_Controller;
 
 class ApiController extends REST_Controller {
+	private static $sys = 'SEWA GERAI';
+
     public function __construct(){
         parent::__construct();
 		// Your own constructor code
@@ -62,7 +64,7 @@ class ApiController extends REST_Controller {
 			$status = parent::HTTP_UNAUTHORIZED;
 			$response = ['status' => $status, 'msg' => 'Unauthorized Access!'];
 		}
-		// echo current_url();
+		$this->logApi($no_akaun,current_url(),$this->JwtModel->getDecodeToken($token),self::$sys,'',$response);
 		$this->response($response);
 	}
 
@@ -103,7 +105,18 @@ class ApiController extends REST_Controller {
 		}else{
 			$status = parent::HTTP_UNAUTHORIZED;
 			$response = ['status' => $status, 'msg' => 'Unauthorized Access!'];
-		}	
+		}
+		$this->logApi($input['NO_AKAUN'],current_url(),$this->JwtModel->getDecodeToken($token),self::$sys,$input,$response);
         $this->response($response);
+	}
+
+	public function logApi($no_akaun,$current_url,$decodeToken,$sys,$request,$response){
+		$log['no_akaun'] = $no_akaun;
+		$log['url_api'] = $current_url;
+		$log['decodeToken'] = $decodeToken;
+		$log['system'] = $sys;
+		$log['request'] = $request;
+		$log['response'] = $response;
+		$this->ApiModel->saveLogApi($log);
 	}
 }
