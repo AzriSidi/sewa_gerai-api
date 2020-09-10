@@ -3,6 +3,7 @@ defined('BASEPATH') OR exit('No direct script access allowed');
 
 require APPPATH.'/libraries/REST_Controller.php';
 use api\libraries\REST_Controller;
+use api\libraries\Format;
 
 class ApiController extends REST_Controller {
 	private static $sys = 'SEWA GERAI';
@@ -110,13 +111,45 @@ class ApiController extends REST_Controller {
         $this->response($response);
 	}
 
-	public function logApi($no_akaun,$current_url,$decodeToken,$sys,$request,$response){
+	function getNoPetak_get($harta){
+		// Get all the headers
+		$headers = $this->input->request_headers();
+		if(isset($headers['Token'])){
+			$token = $headers['Token'];
+		}else{
+			$token = false;
+		}
+		// Extract the token
+		if($token){
+			$authToken = $this->JwtModel->decodeToken($token);
+			if($authToken){
+				$response = $this->ApiModel->getNoPetak($harta);
+			}else{
+				$status = parent::HTTP_UNAUTHORIZED;
+				$response = ['status' => $status, 'msg' => 'Unauthorized Access!'];
+			}
+		}else{
+			$status = parent::HTTP_UNAUTHORIZED;
+			$response = ['status' => $status, 'msg' => 'Unauthorized Access!'];
+		}
+		$this->logApi($harta,current_url(),$this->JwtModel->getDecodeToken($token),self::$sys,'',$response);
+		$this->response($response);
+	}
+
+	public function logApi($no_akaun,$url_api,$decodeToken,$sys,$request,$response){
+		$format = new Format();
+
+		if($request != null){
+			$log['request'] = $format->to_xml($request);
+		}else{
+			$log['request'] = '';
+		}
+
 		$log['no_akaun'] = $no_akaun;
-		$log['url_api'] = $current_url;
+		$log['url_api'] = $url_api;
 		$log['decodeToken'] = $decodeToken;
-		$log['system'] = $sys;
-		$log['request'] = $request;
-		$log['response'] = $response;
+		$log['system'] = $sys;		
+		$log['response'] = $format->to_xml($response);
 		$this->ApiModel->saveLogApi($log);
 	}
 }

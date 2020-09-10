@@ -209,7 +209,7 @@ class ApiModel extends CI_Model{
 
 	public function saveLogApi($log){
 		if($log['request'] != ''){
-			$_REQUEST = $this->arrayToXml($log['request']);
+			$_REQUEST = $log['request'];
 		}else{
 			$_REQUEST = '';
 		}
@@ -219,28 +219,22 @@ class ApiModel extends CI_Model{
 				 ->set('COMPANY_NAME', $log['decodeToken']->company_name)
 				 ->set('SYSTEM', $log['system'])
 				 ->set('REQUEST', $_REQUEST)
-				 ->set('RESPONSE', $this->arrayToXml($log['response']))
+				 ->set('RESPONSE', $log['response'])
 				 ->insert("GERAI.API_LOG");
 	}
 
-	function arrayToXml($array, $rootElement = null, $xml = null) { 
-		$_xml = $xml; 
-		// If there is no Root Element then insert root 
-		if ($_xml === null) { 
-			$_xml = new SimpleXMLElement($rootElement !== null ? $rootElement : '<xml/>'); 
-		} 		  
-		// Visit all key value pair 
-		foreach ($array as $k => $v) {			  
-			// If there is nested array then 
-			if (is_array($v)) {				  
-				// Call function for nested array 
-				$this->arrayToXml($v, $k, $_xml->addChild($k)); 
-				}				  
-			else {				  
-				// Simply add child element.  
-				$_xml->addChild($k, $v); 
-			} 
-		}		  
-		return $_xml->asXML(); 
+	public function getNoPetak($harta){
+		$this->db->select("NO_PETAK")
+        		 ->from('GERAI.JENIS_SEWAAN')
+				 ->where("HARTA",$harta)
+				 ->where("STATUS_SEWA IS NULL")
+				 ->order_by("NO_PETAK",'ASC');
+		$query = $this->db->get();
+		if ($query->num_rows() > 0){
+			$result = $query->result();
+		}else{
+			$result = 'No data';
+		}
+		return $result;
 	}
 }
