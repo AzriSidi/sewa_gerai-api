@@ -111,7 +111,7 @@ class ApiController extends REST_Controller {
         $this->response($response);
 	}
 
-	function getNoPetak_get($harta){
+	function getNoPetak_get($harta,$kod){
 		// Get all the headers
 		$headers = $this->input->request_headers();
 		if(isset($headers['Token'])){
@@ -123,7 +123,7 @@ class ApiController extends REST_Controller {
 		if($token){
 			$authToken = $this->JwtModel->decodeToken($token);
 			if($authToken){
-				$response = $this->ApiModel->getNoPetak($harta);
+				$response = $this->ApiModel->getNoPetak($harta,$kod);
 			}else{
 				$status = parent::HTTP_UNAUTHORIZED;
 				$response = ['status' => $status, 'msg' => 'Unauthorized Access!'];

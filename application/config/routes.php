@@ -56,4 +56,4 @@ $route['getPay/(:any)'] = 'apicontroller/getPay/$1';
 $route['generateToken'] = 'apicontroller/generateToken';
 $route['checkToken'] = 'apicontroller/checkToken';
 $route['updatePay'] = 'apicontroller/updatePay';
-$route['getNoPetak/(:any)'] = 'apicontroller/getNoPetak/$1';
+$route['getNoPetak/(:any)/(:any)'] = 'apicontroller/getNoPetak/$1/$2';

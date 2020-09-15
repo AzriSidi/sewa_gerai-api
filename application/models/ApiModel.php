@@ -225,10 +225,11 @@ class ApiModel extends CI_Model{
 		$this->db->query($sql);
 	}
 
-	public function getNoPetak($harta){
+	public function getNoPetak($harta,$kod){
 		$this->db->select("NO_PETAK")
         		 ->from('GERAI.JENIS_SEWAAN')
 				 ->where("HARTA",$harta)
+				 ->where("KOD_JENIS_SEWAAN",$kod)
 				 ->where("STATUS_SEWA IS NULL")
 				 ->order_by("NO_PETAK",'ASC');
 		$query = $this->db->get();
