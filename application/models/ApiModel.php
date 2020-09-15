@@ -211,16 +211,18 @@ class ApiModel extends CI_Model{
 		if($log['request'] != ''){
 			$_REQUEST = $log['request'];
 		}else{
-			$_REQUEST = '';
+			$_REQUEST = null;
 		}
-		$this->db->set('NO_AKAUN', $log['no_akaun'])
-				 ->set('URL_API', $log['url_api'])
-				 ->set('USER_NAME', $log['decodeToken']->user_name)
-				 ->set('COMPANY_NAME', $log['decodeToken']->company_name)
-				 ->set('SYSTEM', $log['system'])
-				 ->set('REQUEST', $_REQUEST)
-				 ->set('RESPONSE', $log['response'])
-				 ->insert("GERAI.API_LOG");
+
+		$set = "NO_AKAUN,URL_API,USER_NAME,COMPANY_NAME,SYSTEM,REQUEST,RESPONSE";
+		$values = "'".$log['no_akaun']."','".$log['url_api']."','".$log['decodeToken']->user_name."','".$log['decodeToken']->company_name."','".$log['system']."','".$_REQUEST."'";
+		$sql = "declare
+					str varchar2(32767);
+				begin
+					str	:= '".$log['response']."';
+					insert into GERAI.API_LOG ($set) values (".$values.",str);
+				end;";
+		$this->db->query($sql);
 	}
 
 	public function getNoPetak($harta){
