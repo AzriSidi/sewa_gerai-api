@@ -136,6 +136,89 @@ class ApiController extends REST_Controller {
 		$this->response($response);
 	}
 
+	function updateNoPetak_post(){
+		$json = str_replace('[]','null',json_encode($this->post()));		
+		$item = json_decode($json);
+        $input['status_sewa'] = $item->status_sewa;
+		$input['no_akaun'] = $item->no_akaun;
+		$input['fail_rujukan'] = $item->fail_rujukan;
+		$input['nama'] = $item->nama;
+		$input['sewa_seunit'] = $item->sewa_seunit;
+		$input['kp'] = $item->kp;
+		$input['harta'] = $item->harta;
+		$input['kod_jenis_sewaan'] = $item->kod_jenis_sewaan;
+		$input['kod'] = $item->kod;
+		$input['no_petak'] = $item->no_petak;
+		
+		$headers = $this->input->request_headers();
+		if(isset($headers['Token'])){
+			$token = $headers['Token'];
+		}else{
+			$token = false;
+		}
+		// Extract the token
+		if($token){
+			$authToken = $this->JwtModel->decodeToken($token);
+			if($authToken){
+				$data = $this->ApiModel->updateNoPetak($input);
+				if($data){					
+					$status = parent::HTTP_OK;
+					$response = array('status' => $status,'mgs'=>'success');
+				}else{
+					$status = parent::HTTP_FORBIDDEN;
+					$response = ['status' => $status, 'msg' => 'FORBIDDEN'];
+				}
+			}else{
+				$status = parent::HTTP_UNAUTHORIZED;
+				$response = ['status' => $status, 'msg' => 'Unauthorized Access!'];
+			}
+		}else{
+			$status = parent::HTTP_UNAUTHORIZED;
+			$response = ['status' => $status, 'msg' => 'Unauthorized Access!'];
+		}
+
+		$this->logApi($input['no_akaun'],current_url(),$this->JwtModel->getDecodeToken($token),self::$sys,$input,$response);
+		$this->response($response);
+	}
+
+	function updatePostPay_post(){
+		$json = str_replace('[]','null',json_encode($this->post()));		
+		$item = json_decode($json);
+		$input['NO_AKAUN'] = $item->NO_AKAUN;		
+		$input['NO_RESIT'] = $item->NO_RESIT;
+		$input['SALURAN'] = $item->SALURAN;		
+		$input['TARIKH_POST'] = $item->TARIKH_POST;
+
+		$headers = $this->input->request_headers();
+		if(isset($headers['Token'])){
+			$token = $headers['Token'];
+		}else{
+			$token = false;
+		}
+		// Extract the token
+		if($token){
+			$authToken = $this->JwtModel->decodeToken($token);
+			if($authToken){
+				$data = $this->ApiModel->updatePostPay($input);
+				if($data){					
+					$status = parent::HTTP_OK;
+					$response = array('status' => $status,'mgs'=>'success');
+				}else{
+					$status = parent::HTTP_FORBIDDEN;
+					$response = ['status' => $status, 'msg' => 'FORBIDDEN'];
+				}
+			}else{
+				$status = parent::HTTP_UNAUTHORIZED;
+				$response = ['status' => $status, 'msg' => 'Unauthorized Access!'];
+			}
+		}else{
+			$status = parent::HTTP_UNAUTHORIZED;
+			$response = ['status' => $status, 'msg' => 'Unauthorized Access!'];
+		}
+		$this->logApi($input['NO_AKAUN'],current_url(),$this->JwtModel->getDecodeToken($token),self::$sys,$input,$response);
+        $this->response($response);
+	}
+
 	public function logApi($no_akaun,$url_api,$decodeToken,$sys,$request,$response){
 		$format = new Format();
 

@@ -116,22 +116,22 @@ class ApiModel extends CI_Model{
 	}
 
 	public function api_users($input,$token){
+		$mgs = false;
 		$query = $this->db->query("SELECT *  FROM gerai.api_users WHERE
 						  user_name ="."'".$input["user_name"]."'"."AND 
 						  company_name = "."'".$input["company_name"]."'".
 						  "AND auth = '1'");
 		$count_row = $query->num_rows();
-		if ($count_row > 0) {		
-			 return false;
-		} else {
+		if ($count_row < 0) {
 			$this->db
 			 ->set('user_name', "'".$input['user_name']."'", FALSE)
 			 ->set('company_name', "'".$input['company_name']."'", FALSE)
 			 ->set('token', "'".$token."'", FALSE)
 			 ->set('auth', '1', FALSE)
 			 ->insert('gerai.api_users', null, FALSE);
-			return true;
+			 $mgs = true;
 		}
+		return $mgs;
 	}
 	
 	public function check_token($input){
@@ -155,6 +155,7 @@ class ApiModel extends CI_Model{
 	}
 
 	public function auth_token($input){
+		$mgs = false;
 		$this->db->select("*")
         		 ->from('GERAI.API_USERS')
 				 ->where("USER_NAME",$input->user_name)
@@ -162,15 +163,13 @@ class ApiModel extends CI_Model{
 				 ->where("AUTH",'1');
 		$query = $this->db->get();
 		if ($query->num_rows() > 0){
-			return true;
-		}else{
-			return false;
+			$mgs = true;
 		}
+		return $mgs;
 	}
 
 	public function updatePay($input){
-		$mgs = false;
-			
+		$mgs = false;			
 		if(is_null($input['NAMA'])){
 			unset($input['NAMA']);
 			$checkInput = in_array(NULL, $input, true);
@@ -201,7 +200,7 @@ class ApiModel extends CI_Model{
 					->set('NO_RUJUKAN', $input['NO_RUJUKAN'])
 					->set('SALURAN', $input['SALURAN'])
 					->insert("GERAI.BAYARAN_TERKINI");
-				$mgs = true;
+					$mgs = true;
 			}
 		}
 		return $mgs;
@@ -239,5 +238,40 @@ class ApiModel extends CI_Model{
 			$result = 'No data';
 		}
 		return $result;
+	}
+
+	public function updateNoPetak($input){
+		$mgs = false;
+		$this->db->set('status_sewa', $input['status_sewa'])
+				 ->set('no_akaun', $input['no_akaun'])
+				 ->set('fail_rujukan', $input['fail_rujukan'])
+				 ->set('nama_penyewa', $input['nama'])
+				 ->set('sewa_seunit', $input['sewa_seunit'])
+				 ->set('kp1', $input['kp'])
+				 ->where('harta', $input['harta'])
+				 ->where('kod_jenis_sewaan', $input['kod_jenis_sewaan'])
+				 ->where('kod', $input['kod'])
+				 ->where('no_petak', $input['no_petak'])
+				 ->update('GERAI.JENIS_SEWAAN');
+		if($this->db->affected_rows() == '1'){
+			$mgs = true;
+		}
+		return $mgs;
+	}
+
+	public function updatePostPay($input){
+		$mgs = false;
+		
+		if(!is_null($input['TARIKH_POST'])){
+			$this->db->set('TARIKH_POST', "to_date('".$input['TARIKH_POST']."','DDMMYYYY HH24MISS')",FALSE)
+						->where('NO_AKAUN', $input['NO_AKAUN'])
+						->where('NO_RESIT', $input['NO_RESIT'])
+						->where('SALURAN', $input['SALURAN'])					
+						->update("GERAI.BAYARAN_TERKINI");
+			if($this->db->affected_rows() == '1'){
+				$mgs = true;
+			}
+		}
+		return $mgs;
 	}
 }
