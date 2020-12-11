@@ -115,14 +115,15 @@ class ApiModel extends CI_Model{
 		}		
 	}
 
-	public function api_users($input,$token){
-		$mgs = false;
+	public function api_users($input,$token){		
 		$query = $this->db->query("SELECT *  FROM gerai.api_users WHERE
 						  user_name ="."'".$input["user_name"]."'"."AND 
 						  company_name = "."'".$input["company_name"]."'".
 						  "AND auth = '1'");
 		$count_row = $query->num_rows();
-		if ($count_row < 0) {
+		if ($count_row > 0) {
+			$mgs = false;
+		}else{
 			$this->db
 			 ->set('user_name', "'".$input['user_name']."'", FALSE)
 			 ->set('company_name', "'".$input['company_name']."'", FALSE)
