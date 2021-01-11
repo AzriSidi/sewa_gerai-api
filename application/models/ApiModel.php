@@ -219,7 +219,7 @@ class ApiModel extends CI_Model{
 		$sql = "declare
 					str varchar2(32767);
 				begin
-					str	:= '".$log['response']."';
+					str	:= ".$this->db->escape($log['response']).";
 					insert into GERAI.API_LOG ($set) values (".$values.",str);
 				end;";
 		$this->db->query($sql);
