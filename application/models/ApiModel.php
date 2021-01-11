@@ -193,7 +193,7 @@ class ApiModel extends CI_Model{
 			$query = $this->db->get('GERAI.PENYEWA');
 			if ($query->num_rows() > 0){
 				$this->db->set('NO_AKAUN', $input['NO_AKAUN'])
-					->set('NAMA', $input['NAMA'])
+					->set('NAMA', $this->db->escape($input['NAMA']))
 					->set('TARIKH_BAYAR', "to_date('$tkh_byr','DDMMYYYY HH24MISS')",FALSE)
 					->set('NO_RESIT', $input['NO_RESIT'])
 					->set('AMAUN', $input['AMAUN'])
@@ -215,7 +215,7 @@ class ApiModel extends CI_Model{
 		}
 
 		$set = "NO_AKAUN,URL_API,USER_NAME,COMPANY_NAME,SYSTEM,REQUEST,RESPONSE";
-		$values = "'".$log['no_akaun']."','".$log['url_api']."','".$log['decodeToken']->user_name."','".$log['decodeToken']->company_name."','".$log['system']."','".$_REQUEST."'";
+		$values = "'".$log['no_akaun']."','".$log['url_api']."','".$log['decodeToken']->user_name."','".$log['decodeToken']->company_name."','".$log['system']."',".$this->db->escape($_REQUEST)."";
 		$sql = "declare
 					str varchar2(32767);
 				begin
