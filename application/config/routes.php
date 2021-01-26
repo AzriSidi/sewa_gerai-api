@@ -59,3 +59,5 @@ $route['updatePay'] = 'apicontroller/updatePay';
 $route['getNoPetak/(:any)/(:any)'] = 'apicontroller/getNoPetak/$1/$2';
 $route['updateNoPetak'] = 'apicontroller/updateNoPetak';
 $route['updatePostPay'] = 'apicontroller/updatePostPay';
+$route['getDetails/(:any)'] = 'apicontroller/getDetails/$1';
+$route['batalPayment'] = 'apicontroller/batalPayment';

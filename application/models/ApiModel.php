@@ -275,4 +275,118 @@ class ApiModel extends CI_Model{
 		}
 		return $mgs;
 	}
+
+	public function batalPayment($input){
+		$mgs = false;
+		$query = $this->db->query("SELECT *  FROM gerai.bayaran_terkini WHERE
+						  no_akaun ="."'".$input["NO_AKAUN"]."'"."AND 
+						  no_resit = "."'".$input["NO_RESIT"]."'".
+						  "AND TARIKH_POST IS NOT NULL");
+		$count_row = $query->num_rows();
+		if ($count_row > 0) {
+			$mgs = false;
+		}else{
+		
+			if(!is_null($input['TARIKH_BATAL'])){
+				$this->db->set('TARIKH_BATAL', "to_date('".$input['TARIKH_BATAL']."','DDMMYYYY HH24MISS')",FALSE)
+						   ->set('DIBATAL_OLEH', $input['DIBATAL_OLEH'])
+						   ->set('FLAG', $input['FLAG'])
+							->where('NO_AKAUN', $input['NO_AKAUN'])
+							->where('NO_RESIT', $input['NO_RESIT'])
+							->where('SALURAN', $input['SALURAN'])					
+							->update("GERAI.BAYARAN_TERKINI");
+				if($this->db->affected_rows() == '1'){
+					$mgs = true;
+				}
+			}
+			return $mgs;
+			}
+		}
+
+		
+	
+	
+	// ---------------api sewa gerai -details lesen baru 15/12/2020
+	public function getDetails($no_akaun){
+		$clmn_penyewa = 'a.no_akaun,INITCAP (a.nama) nama,a.status_batal,a.tangguh,a.kp1,a.alamat1,a.alamat2,a.alamat3,a.no_lesen,a.status_alamat,';
+		$clmn_sewaan = 'b.no_petak as no_petak,b.harta as kod_harta,';
+		$clmn_kod_jns_sewaan = 'INITCAP (c.keterangan) as jenis_jualan,';
+		$clmn_harta = 'INITCAP (d.keterangan) as harta,';
+		//$clmn_akn_smsa = 'e.TUNGGAKAN as tunggakan,e.SEWA_SEMASA as sewa_semasa,
+		//				  e.BAYAR_LEBIH as bayar_lebih,';
+		//$clmn_prlu_byr = '(sewa_semasa + tunggakan - bayar_lebih) as jumlah_perlu_bayar,';
+		$clmn_jns_hrta = 'f.kod_akaun as kod_akaun';
+		
+		$table_penyewa = 'GERAI.PENYEWA a';
+		$table_sewaan = 'GERAI.SEWAAN b';
+		$table_kod_jns_sewaan = 'GERAI.KOD_JENIS_SEWAAN c';
+		$table_harta = 'GERAI.HARTA d';
+		$table_akn_smsa = 'GERAI.AKAUN_SEMASA e';
+		$table_jns_hrta = 'GERAI.JENIS_HARTA f';
+		
+		$this->db
+			 ->select($clmn_penyewa.$clmn_sewaan.$clmn_kod_jns_sewaan.$clmn_harta.
+						$clmn_jns_hrta." from ".$table_penyewa,false)
+					   //$clmn_akn_smsa.$clmn_prlu_byr
+					   
+			 ->join($table_sewaan,'a.KOD_AKAUN = b.KOD_AKAUN',null,false)
+			 ->join($table_kod_jns_sewaan,'b.KOD_JENIS_SEWAAN=c.KOD',null,false)
+			 ->join($table_harta,'d.KOD=b.HARTA',null,false)
+			 ->join($table_akn_smsa,'e.NO_AKAUN=a.NO_AKAUN',null,false)
+			 ->join($table_jns_hrta,'b.JENIS_HARTA=f.KOD',null,false)
+			 ->where('(a.NO_AKAUN',"'".$no_akaun."'",false)
+			 ->or_where("replace(a.KP1,'-','')","replace('".$no_akaun."','-','')",false)
+			 ->or_where('a.NO_LESEN',"'".$no_akaun."')",false)
+			 ->where('(a.STATUS_BATAL IS NULL',null,false)
+			 ->or_where("a.STATUS_BATAL='A'",null,false)			 
+			 ->or_where("a.STATUS_BATAL='T')",null,false)
+			 ->where('a.TANGGUH IS NULL',null,false)
+			 ->order_by("d.KETERANGAN", "desc",false)
+			 ->order_by("c.KETERANGAN", "desc",false)
+			 ->order_by("b.NO_PETAK", "desc",false);
+			
+		$query = $this->db->get();
+		
+		if ($query->num_rows() > 0){
+			$row = $query->row();
+					
+			if($row->STATUS_BATAL == "X"){
+				$status = "BATAL";
+			}elseif($row->STATUS_BATAL == null OR $row->STATUS_BATAL == "A"){
+				$status = "AKTIF";
+			}elseif($row->STATUS_BATAL == "T"){
+				$status = "TANGGUH";
+			}if($row->TANGGUH == "T"){
+				$status = "TANGGUH";
+			}
+			
+			if($row->STATUS_ALAMAT == "1"){
+				$ket_alamat = "RUMAH";
+			}
+			elseif($row->STATUS_ALAMAT == "2"){
+				$ket_alamat = "PERNIAGAAN";
+			}
+			
+			unset($row->STATUS_BATAL,$row->TANGGUH);
+			$status_arr = array("STATUS" => $status);
+
+			//if($row->JUMLAH_PERLU_BAYAR <> 0){
+			//	$checkResit = $this->checkResit($no_akaun);
+			//}else{
+			//	$checkResit = array(
+			//		"TARIKH" => "",
+			//		"MASA" => "",
+			//		"NO_RESIT" => ""
+			//	);
+			//}
+
+			$result = array_merge((array)$row,$status_arr);
+		}else{
+			$result['mgs'] = "No Data";
+		}
+
+		$this->db->close();
+		return $result;
+	}
+
 }

@@ -235,4 +235,75 @@ class ApiController extends REST_Controller {
 		$log['response'] = $format->to_xml($response);
 		$this->ApiModel->saveLogApi($log);
 	}
+
+// ---------------api sewa gerai -details lesen baru 15/12/2020
+	
+	function getDetails_get($no_akaun){		
+		// Get all the headers
+		$headers = $this->input->request_headers();
+		if(isset($headers['Token'])){
+			$token = $headers['Token'];
+		}else{
+			$token = false;
+		}
+		// Extract the token
+		if($token){
+			$authToken = $this->JwtModel->decodeToken($token);
+//var_dump($authToken);die();
+			if($authToken){
+				$response = $this->ApiModel->getDetails($no_akaun);
+			}else{
+				$status = parent::HTTP_UNAUTHORIZED;
+				$response = ['status' => $status, 'msg' => 'Unauthorized Access!'];
+			}
+		}else{
+			$status = parent::HTTP_UNAUTHORIZED;
+			$response = ['status' => $status, 'msg' => 'Unauthorized Access!'];
+		}
+		$this->logApi($no_akaun,current_url(),$this->JwtModel->getDecodeToken($token),self::$sys,'',$response);
+		$this->response($response);
+	}
+
+// ---------------api sewa gerai -CANANG -BATAL PAYMENT -08012021
+	
+	function batalPayment_post(){
+		$json = str_replace('[]','null',json_encode($this->post()));		
+		$item = json_decode($json);
+		$input['NO_AKAUN'] = $item->NO_AKAUN;		
+		$input['NO_RESIT'] = $item->NO_RESIT;
+		$input['SALURAN'] = $item->SALURAN;		
+		$input['FLAG'] = $item->FLAG;
+		$input['DIBATAL_OLEH'] = $item->DIBATAL_OLEH;
+		$input['TARIKH_BATAL'] = $item->TARIKH_BATAL;
+
+		$headers = $this->input->request_headers();
+		if(isset($headers['Token'])){
+			$token = $headers['Token'];
+		}else{
+			$token = false;
+		}
+		// Extract the token
+		if($token){
+			$authToken = $this->JwtModel->decodeToken($token);
+			if($authToken){
+				$data = $this->ApiModel->batalPayment($input);
+				if($data){					
+					$status = parent::HTTP_OK;
+					$response = array('status' => $status,'mgs'=>'success');
+				}else{
+					$status = parent::HTTP_FORBIDDEN;
+					$response = ['status' => $status, 'msg' => 'FORBIDDEN'];
+				}
+			}else{
+				$status = parent::HTTP_UNAUTHORIZED;
+				$response = ['status' => $status, 'msg' => 'Unauthorized Access!'];
+			}
+		}else{
+			$status = parent::HTTP_UNAUTHORIZED;
+			$response = ['status' => $status, 'msg' => 'Unauthorized Access!'];
+		}
+		$this->logApi($input['NO_AKAUN'],current_url(),$this->JwtModel->getDecodeToken($token),self::$sys,$input,$response);
+       	        $this->response($response);
+	}
+
 }
